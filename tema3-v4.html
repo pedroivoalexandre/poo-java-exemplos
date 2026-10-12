@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Tema3V4 | POO em Java</title><style>*{box-sizing:border-box}body{margin:0;background:#f5f3fa;color:#202033;font:17px/1.6 system-ui,sans-serif}main{max-width:950px;margin:auto;padding:35px 20px}header{margin-bottom:28px}h1{line-height:1.2;font-size:clamp(28px,5vw,40px);margin:10px 0}h2{font-size:22px;margin:0 0 10px}.eyebrow{color:#65269b;font-weight:650}article,form{background:white;border:1px solid #e1dce9;border-radius:14px;padding:24px;margin:18px 0}a{color:#65269b}button,.button{display:inline-block;background:#65269b;color:white;border:0;border-radius:9px;padding:14px 22px;font:600 17px system-ui;cursor:pointer;text-decoration:none}button:focus-visible,a:focus-visible{outline:3px solid #0079ae;outline-offset:4px}pre{white-space:pre;overflow:auto;background:#171723;color:#f3f0fc;border-radius:10px;padding:20px;font:14px/1.6 monospace}summary{cursor:pointer;font-weight:600;margin:16px 0}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}.grid article{margin:0}footer{margin-top:28px;color:#646076;font-size:14px}textarea[hidden]{display:none}@media(max-width:500px){main{padding:24px 15px}article,form{padding:18px}button,.button{width:100%;text-align:center}}</style></head><body><main><header><a href="index.html">← Todos os exemplos</a><p class="eyebrow">Tema 3 · Versão 4</p><h1>Vetor polimórfico</h1><p>Tema3V4.java</p></header>
+<form action="https://www.jdoodle.com/api/redirect-to-post/online-java-compiler" method="post">
+<h2>Execute o exemplo</h2><p>O botão envia o código completo ao JDoodle. Quando o editor abrir, clique em <strong>Execute</strong> e confira o resultado.</p>
+<textarea name="initScript" hidden>interface LimitaVelocidade {
+    int getVelocidadeMaxima();
+}
+
+class Segmento implements LimitaVelocidade {
+    private int tamanho;
+
+    public Segmento(int tamanho) {
+        this.tamanho = tamanho;
+    }
+
+    @Override
+    public int getVelocidadeMaxima() {
+        return 80;
+    }
+
+    public int getTamanho() {
+        return tamanho;
+    }
+}
+class Reta extends Segmento {
+    public Reta(int tamanho) {
+        super(tamanho);
+    }
+
+    @Override
+    public int getVelocidadeMaxima() {
+        return 100;
+    }
+}
+class CurvaTranquila extends Segmento {
+    public CurvaTranquila(int tamanho) {
+        super(tamanho);
+    }
+
+    @Override
+    public int getVelocidadeMaxima() {
+        return 60;
+    }
+}
+class QuebraMola extends Segmento {
+    public QuebraMola(int tamanho) {
+        super(tamanho);
+    }
+
+    @Override
+    public int getVelocidadeMaxima() {
+        return 20;
+    }
+}
+
+public class Tema3V4 {
+    public static void main(String[] args) {
+        LimitaVelocidade[] percurso = {
+            new Reta(500),
+            new CurvaTranquila(120),
+            new QuebraMola(10)
+        };
+
+        for (int i = 0; i &lt; percurso.length; i++) {
+            int limite = percurso[i].getVelocidadeMaxima();
+            System.out.println(&quot;Trecho &quot; + (i + 1) + &quot;: &quot; + limite + &quot; km/h&quot;);
+        }
+    }
+}
+</textarea><button type="submit">Abrir código no JDoodle</button>
+</form><article><h2>Consulte o código</h2><p><a href="https://github.com/pedroivoalexandre/poo-java-exemplos/blob/main/tema3/v4/Tema3V4.java">Ver arquivo no GitHub</a> · <a href="tema3/v4/Tema3V4.java" download>Baixar Java</a></p><details><summary>Mostrar código completo</summary><pre><code>interface LimitaVelocidade {
+    int getVelocidadeMaxima();
+}
+
+class Segmento implements LimitaVelocidade {
+    private int tamanho;
+
+    public Segmento(int tamanho) {
+        this.tamanho = tamanho;
+    }
+
+    @Override
+    public int getVelocidadeMaxima() {
+        return 80;
+    }
+
+    public int getTamanho() {
+        return tamanho;
+    }
+}
+class Reta extends Segmento {
+    public Reta(int tamanho) {
+        super(tamanho);
+    }
+
+    @Override
+    public int getVelocidadeMaxima() {
+        return 100;
+    }
+}
+class CurvaTranquila extends Segmento {
+    public CurvaTranquila(int tamanho) {
+        super(tamanho);
+    }
+
+    @Override
+    public int getVelocidadeMaxima() {
+        return 60;
+    }
+}
+class QuebraMola extends Segmento {
+    public QuebraMola(int tamanho) {
+        super(tamanho);
+    }
+
+    @Override
+    public int getVelocidadeMaxima() {
+        return 20;
+    }
+}
+
+public class Tema3V4 {
+    public static void main(String[] args) {
+        LimitaVelocidade[] percurso = {
+            new Reta(500),
+            new CurvaTranquila(120),
+            new QuebraMola(10)
+        };
+
+        for (int i = 0; i &lt; percurso.length; i++) {
+            int limite = percurso[i].getVelocidadeMaxima();
+            System.out.println(&quot;Trecho &quot; + (i + 1) + &quot;: &quot; + limite + &quot; km/h&quot;);
+        }
+    }
+}
+</code></pre></details></article><footer>POO em Java · Professor Pedro Ivo Alexandre</footer></main></body></html>
