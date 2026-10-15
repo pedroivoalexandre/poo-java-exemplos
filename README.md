@@ -29,4 +29,12 @@ java Tema3V1
 
 Para outra versão, altere a pasta e o nome da classe conforme a tabela.
 
-O GitHub permite consultar e baixar os arquivos. Para executá-los em um compilador online, copie o conteúdo completo do arquivo escolhido para o editor Java.
+Acesse https://pedroivoalexandre.github.io/poo-java-exemplos/ e escolha o tema e a versão. O botão envia o código completo ao JDoodle; no editor, clique em Execute.
+
+## Tema 2 - Complementação
+
+Quatro versões independentes: [tipos e acesso protegido](tema2/v1/Tema2V1.java), [Object, equals e hashCode](tema2/v2/Tema2V2.java), [ArrayList](tema2/v3/Tema2V3.java) e [HashSet](tema2/v4/Tema2V4.java). O [complemento entre pacotes](tema2/pacotes) contém três arquivos para execução em um projeto Java.
+
+## Tema 4 - Tratamento de exceções
+
+Cinco versões: [conversão](tema4/v1/Tema4V1.java), [validação e ordem dos catches](tema4/v2/Tema4V2.java), [finally](tema4/v3/Tema4V3.java), [exceção própria](tema4/v4/Tema4V4.java) e [try-with-resources](tema4/v5/Tema4V5.java).
