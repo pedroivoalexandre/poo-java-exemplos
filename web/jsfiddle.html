@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Abrindo exemplo no JSFiddle</title>
+<style>
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;margin:0;background:#faf8f9;color:#2f292d;display:grid;place-items:center;min-height:100vh}
+main{max-width:680px;margin:24px;padding:28px;background:white;border:1px solid #ddd;border-radius:16px;box-shadow:0 10px 30px #0001;text-align:center}
+h1{color:#5b214f} code{background:#f2eef1;padding:2px 6px;border-radius:5px}
+button{background:#5b214f;color:white;border:0;border-radius:10px;padding:12px 18px;font-weight:700;cursor:pointer}
+.err{color:#9b1c1c}
+</style>
+</head>
+<body>
+<main>
+<h1>MiniLoja → JSFiddle</h1>
+<p id="msg">Preparando o exemplo…</p>
+<form id="f" method="post" action="https://jsfiddle.net/api/post/library/pure/" accept-charset="UTF-8">
+<input type="hidden" name="title" id="title">
+<input type="hidden" name="description" id="description">
+<input type="hidden" name="wrap" value="b">
+<textarea name="html" id="html" hidden></textarea>
+<textarea name="css" id="css" hidden></textarea>
+<textarea name="js" id="js" hidden></textarea>
+<noscript><p class="err">Ative o JavaScript para abrir o exemplo.</p></noscript>
+</form>
+<button id="retry" hidden>Abrir novamente</button>
+</main>
+<script>
+const htmlBase="<!DOCTYPE html>\n<html lang=\"pt-BR\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n  <title>MiniLoja Tech</title>\n</head>\n<body>\n<header>\n  <h1>MiniLoja Tech</h1>\n  <p>Estrutura + apresentação. Agora vamos adicionar comportamento.</p>\n</header>\n<main>\n  <article class=\"produto\" id=\"card-produto\">\n    <span class=\"tag\">Notebook</span>\n    <h2 id=\"produto\">Notebook Atlas 14</h2>\n    <p>Leve, rápido e pronto para estudar.</p>\n    <p id=\"preco\" class=\"preco\">R$ 3.499</p>\n    <p id=\"status\" class=\"status\">Status ainda não calculado</p>\n    <button id=\"comprar\">Comprar</button>\n    <p id=\"mensagem\" class=\"mensagem\"></p>\n    <p id=\"carrinho\">Itens no carrinho: 0</p>\n  </article>\n</main>\n</body>\n</html>";
+const cssBase="* { box-sizing: border-box; }\nbody { margin: 0; font-family: Arial, sans-serif; color: #2f292d; background: #faf8f9; }\nheader { background: #e8d8e2; padding: 22px; text-align: center; border-bottom: 3px solid #5b214f; }\nheader h1 { margin: 0 0 6px; color: #5b214f; }\nmain { width: 88%; max-width: 900px; margin: 34px auto; }\n.produto { background: white; border: 2px solid #73506b; border-radius: 16px; padding: 24px; }\n.produto.destaque { background: #f4d8e5; border-color: #5b214f; transform: translateY(-3px); }\n.tag { display: inline-block; background:#5b214f; color:white; padding:6px 10px; border-radius:999px; font-weight:bold; }\n.preco { font-size: 28px; font-weight: 700; color:#5b214f; }\n.status { font-weight: 700; color:#5a5559; }\nbutton { background:#5b214f; color:white; border:0; border-radius:10px; padding:12px 22px; font-size:18px; cursor:pointer; }\n.mensagem { min-height: 24px; font-weight:700; color:#2d7b57; }";
+const jsMap={"00_base":"// Ainda sem JavaScript.\n","01_console":"console.log(\"MiniLoja carregada\");\n","02_query":"const produto = document.querySelector(\"#produto\");\nconsole.log(produto);\n","03_texto":"const produto = document.querySelector(\"#produto\");\nproduto.textContent = \"Notebook Atlas 14 - PROMOÇÃO\";\n","04_preco":"const preco = 3499;\nconst desconto = 500;\nconst precoFinal = preco - desconto;\n\nconst precoTela = document.querySelector(\"#preco\");\nprecoTela.textContent = \"R$ \" + precoFinal;\n","05_if":"const estoque = 3;\nconst status = document.querySelector(\"#status\");\n\nif (estoque > 0) {\n  status.textContent = \"Disponível para compra\";\n} else {\n  status.textContent = \"Produto indisponível\";\n}\n","06_funcao":"const status = document.querySelector(\"#status\");\nconst estoque = 3;\n\nfunction atualizarStatus() {\n  if (estoque > 0) {\n    status.textContent = \"Disponível para compra\";\n  } else {\n    status.textContent = \"Produto indisponível\";\n  }\n}\n\natualizarStatus();\n","07_evento":"const botao = document.querySelector(\"#comprar\");\nconst mensagem = document.querySelector(\"#mensagem\");\n\nbotao.addEventListener(\"click\", function () {\n  mensagem.textContent = \"Produto adicionado!\";\n});\n","08_class":"const botao = document.querySelector(\"#comprar\");\nconst card = document.querySelector(\"#card-produto\");\n\nbotao.addEventListener(\"click\", function () {\n  card.classList.add(\"destaque\");\n});\n","09_toggle":"const card = document.querySelector(\"#card-produto\");\n\ncard.addEventListener(\"click\", function () {\n  card.classList.toggle(\"destaque\");\n});\n","10_counter":"let quantidade = 0;\nconst botao = document.querySelector(\"#comprar\");\nconst carrinho = document.querySelector(\"#carrinho\");\nconst mensagem = document.querySelector(\"#mensagem\");\n\nbotao.addEventListener(\"click\", function () {\n  quantidade++;\n  carrinho.textContent = \"Itens no carrinho: \" + quantidade;\n\n  if (quantidade >= 3) {\n    mensagem.textContent = \"Limite de 3 itens atingido\";\n  }\n});\n"};
+const labels={
+"00_base":"Ponto de partida",
+"01_console":"Primeiro JavaScript",
+"02_query":"Localizar elemento no DOM",
+"03_texto":"Alterar texto com JavaScript",
+"04_preco":"Variáveis e operadores",
+"05_if":"Decisão com if/else",
+"06_funcao":"Função",
+"07_evento":"Evento de clique",
+"08_class":"JavaScript acionando CSS",
+"09_toggle":"Alternar estado visual",
+"10_counter":"Estado, evento e decisão"
+};
+
+function abrir(){
+  const v=new URLSearchParams(location.search).get("versao") || "00_base";
+  const msg=document.getElementById("msg");
+  if(!(v in jsMap)){
+    msg.className="err";
+    msg.textContent="Versão inválida: "+v;
+    return;
+  }
+  document.getElementById("title").value="WYD7324 - Tema 5 - "+v;
+  document.getElementById("description").value=labels[v]+" | MiniLoja | Prof. Pedro Ivo Alexandre";
+  document.getElementById("html").value=htmlBase;
+  document.getElementById("css").value=cssBase;
+  document.getElementById("js").value=jsMap[v];
+  msg.innerHTML="Abrindo <code>"+v+"</code> no JSFiddle…";
+  document.getElementById("retry").hidden=false;
+  document.getElementById("f").submit();
+}
+document.getElementById("retry").addEventListener("click", abrir);
+setTimeout(abrir, 120);
+</script>
+</body>
+</html>
