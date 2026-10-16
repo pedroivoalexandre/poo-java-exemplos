@@ -1,0 +1,12 @@
+* { box-sizing: border-box; }
+body { margin: 0; font-family: Arial, sans-serif; color: #2f292d; background: #faf8f9; }
+header { background: #e8d8e2; padding: 22px; text-align: center; border-bottom: 3px solid #5b214f; }
+header h1 { margin: 0 0 6px; color: #5b214f; }
+main { width: 88%; max-width: 900px; margin: 34px auto; }
+.produto { background: white; border: 2px solid #73506b; border-radius: 16px; padding: 24px; }
+.produto.destaque { background: #f4d8e5; border-color: #5b214f; transform: translateY(-3px); }
+.tag { display: inline-block; background:#5b214f; color:white; padding:6px 10px; border-radius:999px; font-weight:bold; }
+.preco { font-size: 28px; font-weight: 700; color:#5b214f; }
+.status { font-weight: 700; color:#5a5559; }
+button { background:#5b214f; color:white; border:0; border-radius:10px; padding:12px 22px; font-size:18px; cursor:pointer; }
+.mensagem { min-height: 24px; font-weight:700; color:#2d7b57; }
