@@ -1,0 +1,287 @@
+<!doctype html><html lang="pt-BR"><meta charset="utf-8"><title>Códigos — Tema 6</title><style>body{max-width:1000px;margin:30px auto;font:16px Arial;line-height:1.5}pre{white-space:pre-wrap;background:#f4f4f6;padding:18px;font:13px Consolas,monospace}section{break-before:page}a{color:#59228b}@media print{body{margin:0}button{display:none}pre{font-size:10pt}h2{break-after:avoid}}@page{margin:15mm}</style><h1>Tema 6 — Banco de dados com JDBC</h1><p>PEDRO IVO ALEXANDRE · Código completo</p><p><a href="https://www.jdoodle.com/online-java-compiler-ide">Abrir JDoodle</a> — copie uma versão completa para o editor. O link abre o compilador; não promete carregamento automático.</p><p>Biblioteca Maven: <code>com.h2database:h2:2.3.232</code>. Banco em memória; dados não persistem entre processos.</p><p>Saídas esperadas; execução de teste pendente nesta sessão.</p><section><h2>Tema6V1 — Conectar e criar a tabela</h2><pre>import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+public class Tema6V1 {
+    public static void main(String[] args) {
+        try (Connection conexao = DriverManager.getConnection(
+                &quot;jdbc:h2:mem:motos&quot;, &quot;sa&quot;, &quot;&quot;);
+             Statement comando = conexao.createStatement()) {
+            comando.executeUpdate(&quot;CREATE TABLE moto (&quot;
+                + &quot;id INT PRIMARY KEY, nome VARCHAR(60), &quot;
+                + &quot;velocidade INT CHECK (velocidade &gt;= 0))&quot;);
+            System.out.println(&quot;Tabela criada&quot;);
+        } catch (SQLException erro) {
+            System.out.println(&quot;Falha SQL: &quot; + erro.getMessage());
+        }
+    }
+}</pre><h3>Saída ou efeito esperado</h3><pre>Tabela criada
+Requer a biblioteca Maven com.h2database:h2:2.3.232.</pre></section><section><h2>Tema6V2 — Inserir e consultar com parâmetros</h2><pre>import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+public class Tema6V2 {
+    static void criarTabela(Connection conexao) throws SQLException {
+        try (Statement comando = conexao.createStatement()) {
+            comando.executeUpdate(&quot;CREATE TABLE moto (&quot;
+                + &quot;id INT PRIMARY KEY, nome VARCHAR(60), &quot;
+                + &quot;velocidade INT CHECK (velocidade &gt;= 0))&quot;);
+        }
+    }
+    static void inserir(Connection conexao, int id, String nome, int v)
+            throws SQLException {
+        String sql = &quot;INSERT INTO moto VALUES (?, ?, ?)&quot;;
+        try (PreparedStatement comando = conexao.prepareStatement(sql)) {
+            comando.setInt(1, id);
+            comando.setString(2, nome);
+            comando.setInt(3, v);
+            comando.executeUpdate();
+        }
+    }
+    static void consultar(Connection conexao) throws SQLException {
+        String sql = &quot;SELECT id, nome, velocidade FROM moto ORDER BY id&quot;;
+        try (PreparedStatement comando = conexao.prepareStatement(sql);
+             ResultSet resultado = comando.executeQuery()) {
+            while (resultado.next()) {
+                System.out.println(resultado.getInt(&quot;id&quot;) + &quot; &quot;
+                    + resultado.getString(&quot;nome&quot;) + &quot; &quot;
+                    + resultado.getInt(&quot;velocidade&quot;));
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        try (Connection conexao = DriverManager.getConnection(
+                &quot;jdbc:h2:mem:motos&quot;, &quot;sa&quot;, &quot;&quot;)) {
+            criarTabela(conexao);
+            inserir(conexao, 1, &quot;Moto A&quot;, 60);
+            inserir(conexao, 2, &quot;Moto B&quot;, 40);
+            consultar(conexao);
+        } catch (SQLException erro) {
+            System.out.println(&quot;Falha SQL: &quot; + erro.getMessage());
+        }
+    }
+}</pre><h3>Saída ou efeito esperado</h3><pre>1 Moto A 60
+2 Moto B 40</pre></section><section><h2>Tema6V3 — Atualizar e excluir registros</h2><pre>import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+public class Tema6V3 {
+    static void criarTabela(Connection conexao) throws SQLException {
+        try (Statement comando = conexao.createStatement()) {
+            comando.executeUpdate(&quot;CREATE TABLE moto (&quot;
+                + &quot;id INT PRIMARY KEY, nome VARCHAR(60), &quot;
+                + &quot;velocidade INT CHECK (velocidade &gt;= 0))&quot;);
+        }
+    }
+    static void inserir(Connection conexao, int id, String nome, int v)
+            throws SQLException {
+        String sql = &quot;INSERT INTO moto VALUES (?, ?, ?)&quot;;
+        try (PreparedStatement comando = conexao.prepareStatement(sql)) {
+            comando.setInt(1, id);
+            comando.setString(2, nome);
+            comando.setInt(3, v);
+            comando.executeUpdate();
+        }
+    }
+    static void consultar(Connection conexao) throws SQLException {
+        String sql = &quot;SELECT id, nome, velocidade FROM moto ORDER BY id&quot;;
+        try (PreparedStatement comando = conexao.prepareStatement(sql);
+             ResultSet resultado = comando.executeQuery()) {
+            while (resultado.next()) {
+                System.out.println(resultado.getInt(&quot;id&quot;) + &quot; &quot;
+                    + resultado.getString(&quot;nome&quot;) + &quot; &quot;
+                    + resultado.getInt(&quot;velocidade&quot;));
+            }
+        }
+    }
+    static int alterar(Connection conexao, int id, int v)
+            throws SQLException {
+        String sql = &quot;UPDATE moto SET velocidade = ? WHERE id = ?&quot;;
+        try (PreparedStatement comando = conexao.prepareStatement(sql)) {
+            comando.setInt(1, v);
+            comando.setInt(2, id);
+            return comando.executeUpdate();
+        }
+    }
+    static int excluir(Connection conexao, int id) throws SQLException {
+        try (PreparedStatement comando = conexao.prepareStatement(
+                &quot;DELETE FROM moto WHERE id = ?&quot;)) {
+            comando.setInt(1, id);
+            return comando.executeUpdate();
+        }
+    }
+
+    public static void main(String[] args) {
+        try (Connection conexao = DriverManager.getConnection(
+                &quot;jdbc:h2:mem:motos&quot;, &quot;sa&quot;, &quot;&quot;)) {
+            criarTabela(conexao);
+            inserir(conexao, 1, &quot;Moto A&quot;, 60);
+            inserir(conexao, 2, &quot;Moto B&quot;, 40);
+            System.out.println(&quot;Alteradas: &quot; + alterar(conexao, 1, 80));
+            System.out.println(&quot;Excluidas: &quot; + excluir(conexao, 2));
+            consultar(conexao);
+        } catch (SQLException erro) {
+            System.out.println(&quot;Falha SQL: &quot; + erro.getMessage());
+        }
+    }
+}</pre><h3>Saída ou efeito esperado</h3><pre>Alteradas: 1
+Excluidas: 1
+1 Moto A 80</pre></section><section><h2>Tema6V4 — Transação com falha e rollback</h2><pre>import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+public class Tema6V4 {
+    static void criarTabela(Connection conexao) throws SQLException {
+        try (Statement comando = conexao.createStatement()) {
+            comando.executeUpdate(&quot;CREATE TABLE moto (&quot;
+                + &quot;id INT PRIMARY KEY, nome VARCHAR(60), &quot;
+                + &quot;velocidade INT CHECK (velocidade &gt;= 0))&quot;);
+        }
+    }
+    static void inserir(Connection conexao, int id, String nome, int v)
+            throws SQLException {
+        String sql = &quot;INSERT INTO moto VALUES (?, ?, ?)&quot;;
+        try (PreparedStatement comando = conexao.prepareStatement(sql)) {
+            comando.setInt(1, id);
+            comando.setString(2, nome);
+            comando.setInt(3, v);
+            comando.executeUpdate();
+        }
+    }
+    static void consultar(Connection conexao) throws SQLException {
+        String sql = &quot;SELECT id, nome, velocidade FROM moto ORDER BY id&quot;;
+        try (PreparedStatement comando = conexao.prepareStatement(sql);
+             ResultSet resultado = comando.executeQuery()) {
+            while (resultado.next()) {
+                System.out.println(resultado.getInt(&quot;id&quot;) + &quot; &quot;
+                    + resultado.getString(&quot;nome&quot;) + &quot; &quot;
+                    + resultado.getInt(&quot;velocidade&quot;));
+            }
+        }
+    }
+    static int alterar(Connection conexao, int id, int v)
+            throws SQLException {
+        String sql = &quot;UPDATE moto SET velocidade = ? WHERE id = ?&quot;;
+        try (PreparedStatement comando = conexao.prepareStatement(sql)) {
+            comando.setInt(1, v);
+            comando.setInt(2, id);
+            return comando.executeUpdate();
+        }
+    }
+    static int excluir(Connection conexao, int id) throws SQLException {
+        try (PreparedStatement comando = conexao.prepareStatement(
+                &quot;DELETE FROM moto WHERE id = ?&quot;)) {
+            comando.setInt(1, id);
+            return comando.executeUpdate();
+        }
+    }
+
+    public static void main(String[] args) {
+        try (Connection conexao = DriverManager.getConnection(
+                &quot;jdbc:h2:mem:motos&quot;, &quot;sa&quot;, &quot;&quot;)) {
+            criarTabela(conexao);
+            inserir(conexao, 1, &quot;Moto A&quot;, 60);
+            conexao.setAutoCommit(false);
+            try {
+                alterar(conexao, 1, 80);
+                inserir(conexao, 1, &quot;Duplicada&quot;, 40);
+                conexao.commit();
+                System.out.println(&quot;Transacao confirmada&quot;);
+            } catch (SQLException erro) {
+                conexao.rollback();
+                System.out.println(&quot;Transacao desfeita&quot;);
+            }
+            consultar(conexao);
+            conexao.commit();
+        } catch (SQLException erro) {
+            System.out.println(&quot;Falha SQL: &quot; + erro.getMessage());
+        }
+    }
+}</pre><h3>Saída ou efeito esperado</h3><pre>Transacao desfeita
+1 Moto A 60
+A tabela e a carga inicial são criadas antes da transação didática.</pre></section><section><h2>Tema6V5 — Separar o objeto e o acesso ao banco</h2><pre>import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+class Moto {
+    private int id;
+    private String nome;
+    private int velocidade;
+    Moto(int id, String nome, int velocidade) {
+        if (velocidade &lt; 0) {
+            throw new IllegalArgumentException(&quot;Velocidade negativa&quot;);
+        }
+        this.id = id;
+        this.nome = nome;
+        this.velocidade = velocidade;
+    }
+    int getId() { return id; }
+    String getNome() { return nome; }
+    int getVelocidade() { return velocidade; }
+}
+class MotoDAO {
+    private Connection conexao;
+    MotoDAO(Connection conexao) { this.conexao = conexao; }
+    void criarTabela() throws SQLException {
+        try (Statement comando = conexao.createStatement()) {
+            comando.executeUpdate(&quot;CREATE TABLE moto (&quot;
+                + &quot;id INT PRIMARY KEY, nome VARCHAR(60), &quot;
+                + &quot;velocidade INT CHECK (velocidade &gt;= 0))&quot;);
+        }
+    }
+    void salvar(Moto moto) throws SQLException {
+        try (PreparedStatement comando = conexao.prepareStatement(
+                &quot;INSERT INTO moto VALUES (?, ?, ?)&quot;)) {
+            comando.setInt(1, moto.getId());
+            comando.setString(2, moto.getNome());
+            comando.setInt(3, moto.getVelocidade());
+            comando.executeUpdate();
+        }
+    }
+    Moto buscar(int id) throws SQLException {
+        try (PreparedStatement comando = conexao.prepareStatement(
+                &quot;SELECT id, nome, velocidade FROM moto WHERE id = ?&quot;)) {
+            comando.setInt(1, id);
+            try (ResultSet resultado = comando.executeQuery()) {
+                if (resultado.next()) {
+                    return new Moto(resultado.getInt(&quot;id&quot;),
+                        resultado.getString(&quot;nome&quot;),
+                        resultado.getInt(&quot;velocidade&quot;));
+                }
+                return null;
+            }
+        }
+    }
+}
+public class Tema6V5 {
+    public static void main(String[] args) {
+        try (Connection conexao = DriverManager.getConnection(
+                &quot;jdbc:h2:mem:motos&quot;, &quot;sa&quot;, &quot;&quot;)) {
+            MotoDAO dao = new MotoDAO(conexao);
+            dao.criarTabela();
+            dao.salvar(new Moto(1, &quot;Moto A&quot;, 60));
+            Moto encontrada = dao.buscar(1);
+            if (encontrada != null) {
+                System.out.println(encontrada.getNome() + &quot; &quot;
+                    + encontrada.getVelocidade());
+            }
+        } catch (SQLException erro) {
+            System.out.println(&quot;Falha SQL: &quot; + erro.getMessage());
+        }
+    }
+}</pre><h3>Saída ou efeito esperado</h3><pre>Moto A 60
+O DAO fecha comandos e resultados; main é dono da Connection e a fecha.</pre></section></html>

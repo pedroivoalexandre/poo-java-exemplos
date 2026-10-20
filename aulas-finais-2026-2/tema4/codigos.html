@@ -1,0 +1,109 @@
+<!doctype html><html lang="pt-BR"><meta charset="utf-8"><title>Códigos — Tema 4</title><style>body{max-width:1000px;margin:30px auto;font:16px Arial;line-height:1.5}pre{white-space:pre-wrap;background:#f4f4f6;padding:18px;font:13px Consolas,monospace}section{break-before:page}a{color:#59228b}@media print{body{margin:0}button{display:none}pre{font-size:10pt}h2{break-after:avoid}}@page{margin:15mm}</style><h1>Tema 4 — Exceções</h1><p>PEDRO IVO ALEXANDRE · Código completo</p><p><a href="https://www.jdoodle.com/online-java-compiler-ide">Abrir JDoodle</a> — copie uma versão completa para o editor. O link abre o compilador; não promete carregamento automático.</p><p>Saídas esperadas; execução de teste pendente nesta sessão.</p><section><h2>Tema4V1 — Conversão e tratamento</h2><pre>public class Tema4V1 {
+    public static void main(String[] args) {
+        String[] entradas = {&quot;60&quot;, &quot;rapida&quot;, &quot;40&quot;};
+        for (int i = 0; i &lt; entradas.length; i++) {
+            try {
+                int v = Integer.parseInt(entradas[i]);
+                System.out.println(&quot;Velocidade: &quot; + v);
+            } catch (NumberFormatException erro) {
+                System.out.println(&quot;Formato invalido&quot;);
+            }
+        }
+    }
+}</pre><h3>Saída ou efeito esperado</h3><pre>Velocidade: 60
+Formato invalido
+Velocidade: 40</pre></section><section><h2>Tema4V2 — A moto preserva seu estado</h2><pre>class Moto {
+    private int velocidadeDesejada;
+    Moto(int velocidade) {
+        definirVelocidade(velocidade);
+    }
+    void definirVelocidade(int velocidade) {
+        if (velocidade &lt; 0) {
+            throw new IllegalArgumentException(&quot;Velocidade negativa&quot;);
+        }
+        velocidadeDesejada = velocidade;
+    }
+    int getVelocidadeDesejada() {
+        return velocidadeDesejada;
+    }
+}
+public class Tema4V2 {
+    public static void main(String[] args) {
+        Moto moto = new Moto(60);
+        try {
+            moto.definirVelocidade(-10);
+        } catch (IllegalArgumentException erro) {
+            System.out.println(erro.getMessage());
+        }
+        System.out.println(moto.getVelocidadeDesejada());
+    }
+}</pre><h3>Saída ou efeito esperado</h3><pre>Velocidade negativa
+60</pre></section><section><h2>Tema4V3 — Formato, domínio e encerramento</h2><pre>class Moto {
+    private int velocidadeDesejada;
+    Moto(int velocidade) {
+        if (velocidade &lt; 0) {
+            throw new IllegalArgumentException(&quot;Velocidade negativa&quot;);
+        }
+        velocidadeDesejada = velocidade;
+    }
+}
+public class Tema4V3 {
+    public static void main(String[] args) {
+        String[] entradas = {&quot;rapida&quot;, &quot;-10&quot;, &quot;60&quot;};
+        for (int i = 0; i &lt; entradas.length; i++) {
+            try {
+                int v = Integer.parseInt(entradas[i]);
+                new Moto(v);
+                System.out.println(&quot;Cadastro aceito&quot;);
+            } catch (NumberFormatException erro) {
+                System.out.println(&quot;Formato invalido&quot;);
+            } catch (IllegalArgumentException erro) {
+                System.out.println(&quot;Valor invalido&quot;);
+            } finally {
+                System.out.println(&quot;Tentativa encerrada&quot;);
+            }
+        }
+    }
+}</pre><h3>Saída ou efeito esperado</h3><pre>Formato invalido
+Tentativa encerrada
+Valor invalido
+Tentativa encerrada
+Cadastro aceito
+Tentativa encerrada</pre></section><section><h2>Tema4V4 — Exceção verificada do percurso</h2><pre>class PercursoInvalidoException extends Exception {
+    PercursoInvalidoException(String mensagem) {
+        super(mensagem);
+    }
+}
+class Estrada {
+    private int metros;
+    Estrada(int metros) throws PercursoInvalidoException {
+        if (metros &lt;= 0) {
+            throw new PercursoInvalidoException(&quot;Percurso sem tamanho&quot;);
+        }
+        this.metros = metros;
+    }
+    int getMetros() {
+        return metros;
+    }
+}
+public class Tema4V4 {
+    public static void main(String[] args) {
+        try {
+            Estrada estrada = new Estrada(0);
+            System.out.println(estrada.getMetros());
+        } catch (PercursoInvalidoException erro) {
+            System.out.println(erro.getMessage());
+        }
+    }
+}</pre><h3>Saída ou efeito esperado</h3><pre>Percurso sem tamanho</pre></section><section><h2>Tema4V5 — Fechamento automático de recurso</h2><pre>import java.io.IOException;
+import java.io.StringReader;
+
+public class Tema4V5 {
+    public static void main(String[] args) {
+        try (StringReader leitor = new StringReader(&quot;90&quot;)) {
+            System.out.println(leitor.read());
+        } catch (IOException erro) {
+            System.out.println(&quot;Falha na leitura&quot;);
+        }
+    }
+}</pre><h3>Saída ou efeito esperado</h3><pre>57</pre></section></html>

@@ -1,0 +1,184 @@
+<!doctype html><html lang="pt-BR"><meta charset="utf-8"><title>Códigos — Tema 5</title><style>body{max-width:1000px;margin:30px auto;font:16px Arial;line-height:1.5}pre{white-space:pre-wrap;background:#f4f4f6;padding:18px;font:13px Consolas,monospace}section{break-before:page}a{color:#59228b}@media print{body{margin:0}button{display:none}pre{font-size:10pt}h2{break-after:avoid}}@page{margin:15mm}</style><h1>Tema 5 — Threads e concorrência</h1><p>PEDRO IVO ALEXANDRE · Código completo</p><p><a href="https://www.jdoodle.com/online-java-compiler-ide">Abrir JDoodle</a> — copie uma versão completa para o editor. O link abre o compilador; não promete carregamento automático.</p><p>Saídas esperadas; execução de teste pendente nesta sessão.</p><section><h2>Tema5V1 — Execução sequencial</h2><pre>class Moto {
+    private String nome;
+    Moto(String nome) {
+        this.nome = nome;
+    }
+    void percorrer() {
+        for (int trecho = 1; trecho &lt;= 3; trecho++) {
+            System.out.println(nome + &quot;: trecho &quot; + trecho);
+        }
+    }
+}
+public class Tema5V1 {
+    public static void main(String[] args) {
+        Moto a = new Moto(&quot;A&quot;);
+        Moto b = new Moto(&quot;B&quot;);
+        a.percorrer();
+        b.percorrer();
+    }
+}</pre><h3>Saída ou efeito esperado</h3><pre>A: trecho 1
+A: trecho 2
+A: trecho 3
+B: trecho 1
+B: trecho 2
+B: trecho 3</pre></section><section><h2>Tema5V2 — Uma tarefa Runnable e duas threads</h2><pre>class Moto implements Runnable {
+    private String nome;
+    Moto(String nome) {
+        this.nome = nome;
+    }
+    @Override
+    public void run() {
+        for (int trecho = 1; trecho &lt;= 3; trecho++) {
+            System.out.println(nome + &quot;: trecho &quot; + trecho);
+        }
+    }
+}
+public class Tema5V2 {
+    public static void main(String[] args) throws InterruptedException {
+        Thread a = new Thread(new Moto(&quot;A&quot;));
+        Thread b = new Thread(new Moto(&quot;B&quot;));
+        a.start();
+        b.start();
+        a.join();
+        b.join();
+        System.out.println(&quot;Percurso encerrado&quot;);
+    }
+}</pre><h3>Saída ou efeito esperado</h3><pre>Uma saída possível; a intercalação pode mudar:
+A: trecho 1
+B: trecho 1
+B: trecho 2
+A: trecho 2
+A: trecho 3
+B: trecho 3
+Percurso encerrado</pre></section><section><h2>Tema5V3 — Pausa e interrupção cooperativa</h2><pre>class Moto implements Runnable {
+    private String nome;
+    Moto(String nome) {
+        this.nome = nome;
+    }
+    @Override
+    public void run() {
+        try {
+            for (int trecho = 1; trecho &lt;= 3; trecho++) {
+                Thread.sleep(50);
+                System.out.println(nome + &quot;: trecho &quot; + trecho);
+            }
+        } catch (InterruptedException erro) {
+            Thread.currentThread().interrupt();
+            System.out.println(nome + &quot;: interrompida&quot;);
+        }
+    }
+}
+public class Tema5V3 {
+    public static void main(String[] args) throws InterruptedException {
+        Thread a = new Thread(new Moto(&quot;A&quot;));
+        a.start();
+        a.join();
+        System.out.println(&quot;Fim&quot;);
+    }
+}</pre><h3>Saída ou efeito esperado</h3><pre>A: trecho 1
+A: trecho 2
+A: trecho 3
+Fim
+Sem interrupção solicitada neste main. sleep não mede o tempo físico da moto.</pre></section><section><h2>Tema5V4 — Estado compartilhado sem proteção</h2><pre>class Placar {
+    private int passagens;
+    void registrar() {
+        passagens++;
+    }
+    int getPassagens() {
+        return passagens;
+    }
+}
+class Moto implements Runnable {
+    private Placar placar;
+    Moto(Placar placar) {
+        this.placar = placar;
+    }
+    @Override
+    public void run() {
+        for (int i = 0; i &lt; 100000; i++) {
+            placar.registrar();
+        }
+    }
+}
+public class Tema5V4 {
+    public static void main(String[] args) throws InterruptedException {
+        Placar placar = new Placar();
+        Thread a = new Thread(new Moto(placar));
+        Thread b = new Thread(new Moto(placar));
+        a.start();
+        b.start();
+        a.join();
+        b.join();
+        System.out.println(placar.getPassagens());
+    }
+}</pre><h3>Saída ou efeito esperado</h3><pre>Não há total garantido. 200000 é possível, mas atualizações podem ser perdidas. Uma execução que imprime 200000 não demonstra ausência da corrida.</pre></section><section><h2>Tema5V5 — Estado compartilhado protegido</h2><pre>class Placar {
+    private int passagens;
+    synchronized void registrar() {
+        passagens++;
+    }
+    int getPassagens() {
+        return passagens;
+    }
+}
+class Moto implements Runnable {
+    private Placar placar;
+    Moto(Placar placar) {
+        this.placar = placar;
+    }
+    @Override
+    public void run() {
+        for (int i = 0; i &lt; 100000; i++) {
+            placar.registrar();
+        }
+    }
+}
+public class Tema5V5 {
+    public static void main(String[] args) throws InterruptedException {
+        Placar placar = new Placar();
+        Thread a = new Thread(new Moto(placar));
+        Thread b = new Thread(new Moto(placar));
+        a.start();
+        b.start();
+        a.join();
+        b.join();
+        System.out.println(placar.getPassagens());
+    }
+}</pre><h3>Saída ou efeito esperado</h3><pre>200000</pre></section><section><h2>Tema5V6 — Coordenador com vetor de threads</h2><pre>class Placar {
+    private int chegadas;
+    synchronized void registrar() {
+        chegadas++;
+    }
+    int getChegadas() {
+        return chegadas;
+    }
+}
+class Moto implements Runnable {
+    private String nome;
+    private Placar placar;
+    Moto(String nome, Placar placar) {
+        this.nome = nome;
+        this.placar = placar;
+    }
+    @Override
+    public void run() {
+        for (int trecho = 1; trecho &lt;= 3; trecho++) {
+            System.out.println(nome + &quot;: trecho &quot; + trecho);
+        }
+        placar.registrar();
+    }
+}
+public class Tema5V6 {
+    public static void main(String[] args) throws InterruptedException {
+        Placar placar = new Placar();
+        Thread[] motos = new Thread[3];
+        for (int i = 0; i &lt; motos.length; i++) {
+            motos[i] = new Thread(new Moto(&quot;Moto &quot; + (i + 1), placar));
+            motos[i].start();
+        }
+        for (int i = 0; i &lt; motos.length; i++) {
+            motos[i].join();
+        }
+        System.out.println(&quot;Chegadas: &quot; + placar.getChegadas());
+    }
+}</pre><h3>Saída ou efeito esperado</h3><pre>Nove linhas dos trechos em ordem variável entre motos.
+A última linha é: Chegadas: 3</pre></section></html>
